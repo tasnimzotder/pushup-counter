@@ -1,16 +1,15 @@
-# pushup_counter
+# Pushup Counter App
 
-A new Flutter project.
+## Description
 
-## Getting Started
+A simple flutter based app that tracks pushup count using the device's proximity sensor.
 
-This project is a starting point for a Flutter application.
+## Tech Stack
 
-A few resources to get you started if this is your first Flutter project:
+- Flutter
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+## Screenshots
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<p align="center">
+    <img alt="demo screenshot" src="resources/demo-screenshot.jpg" width="50%" />
+</p>
