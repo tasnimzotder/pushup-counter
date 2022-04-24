@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:proximity_sensor/proximity_sensor.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 export 'homepage.dart';
 
@@ -20,10 +21,72 @@ class _HomePageState extends State<HomePage> {
   bool _isStart = false;
   String _startBtnMsg = 'Start';
   Color _indicatorColor = Colors.red;
+  bool _muteState = false;
 
   late StreamSubscription<dynamic> _streamSubscription;
 
+  var displayMessages = {
+    '0': 'Start your journey!',
+    '1': 'Started!',
+    '2': 'Keep Going!',
+    '3': 'One more!',
+    '4': 'Fire. Don\'t stop!',
+    '5': 'Towards next stop!',
+    '6': 'Keep Going!',
+    '7': 'You\'re really on fire!',
+    '8': 'You can do it!',
+    '9': 'Pro in Push-up!',
+    '10': 'You\'re in beast mode!'
+  };
+  String _displayMsg = 'Start your journey!';
+
   void updateCounter() {
+    if (_counter == 0) {
+      setState(() {
+        _displayMsg = displayMessages['0'] as String;
+      });
+    } else if (_counter > 0 && _counter < 5) {
+      setState(() {
+        _displayMsg = displayMessages['1'] as String;
+      });
+    } else if (_counter == 5) {
+      setState(() {
+        _displayMsg = displayMessages['2'] as String;
+      });
+    } else if (_counter > 5 && _counter < 10) {
+      setState(() {
+        _displayMsg = displayMessages['3'] as String;
+      });
+    } else if (_counter == 10) {
+      setState(() {
+        _displayMsg = displayMessages['4'] as String;
+      });
+    } else if (_counter > 10 && _counter < 15) {
+      setState(() {
+        _displayMsg = displayMessages['5'] as String;
+      });
+    } else if (_counter == 15) {
+      setState(() {
+        _displayMsg = displayMessages['6'] as String;
+      });
+    } else if (_counter > 15 && _counter < 20) {
+      setState(() {
+        _displayMsg = displayMessages['7'] as String;
+      });
+    } else if (_counter > 20 && _counter < 25) {
+      setState(() {
+        _displayMsg = displayMessages['8'] as String;
+      });
+    } else if (_counter == 25) {
+      setState(() {
+        _displayMsg = displayMessages['9'] as String;
+      });
+    } else if (_counter > 25) {
+      setState(() {
+        _displayMsg = displayMessages['10'] as String;
+      });
+    }
+
     if (_isStart == true) {
       if (_isNear) {
         setState(() {
@@ -36,9 +99,13 @@ class _HomePageState extends State<HomePage> {
       }
 
       if (_isNear == true && _currState == false) {
-        setState(() {
+        setState(() async {
           _counter++;
           _currState = true;
+
+          if (!_muteState) {
+            await _playAudioDing();
+          }
         });
       } else if (_currState = true & _isNear == true) {
         setState(() {
@@ -75,6 +142,21 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  _displaySoundController() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 36.0),
+      child: TextButton(
+        onPressed: () {
+          setState(() {
+            _muteState = _muteState ? false : true;
+          });
+        },
+        child: Icon(
+            _muteState ? Icons.volume_off_outlined : Icons.volume_up_outlined),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,42 +171,44 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // alert section
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 20.0, horizontal: 30.0),
-              alignment: Alignment.topRight,
-              // height: 50.0,
-              // color: Colors.red,
-              child: CircleAvatar(
-                // backgroundColor: _indicatorColors['red'],
-                backgroundColor: _indicatorColor,
-                radius: 20.0,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _displaySoundController(),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 20.0, horizontal: 30.0),
+                  alignment: Alignment.topRight,
+                  // height: 50.0,
+                  // color: Colors.red,
+                  child: CircleAvatar(
+                    // backgroundColor: _indicatorColors['red'],
+                    backgroundColor: _indicatorColor,
+                    radius: 20.0,
+                  ),
+                ),
+              ],
             ),
 
             // main body (counter and action buttons)
             Expanded(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    child: Text(
-                      '$_counter',
-                      style: const TextStyle(
-                        fontSize: 108.0,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.black,
-                      ),
-                    ),
+                  _displayCounterWidget(_counter),
+                  // display message
+                  Text(
+                    _displayMsg,
+                    style:
+                        const TextStyle(fontSize: 24.0, color: Colors.black87),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      RaisedButton(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10.0, vertical: 5.0),
+                      ElevatedButton(
+                        // padding: const EdgeInsets.symmetric(
+                        //     horizontal: 10.0, vertical: 5.0),
                         child: Text(
                           _startBtnMsg,
                           style: const TextStyle(
@@ -132,7 +216,7 @@ class _HomePageState extends State<HomePage> {
                               color: Colors.white,
                               fontWeight: FontWeight.w300),
                         ),
-                        color: Colors.blueGrey,
+                        // color: Colors.blueGrey,
                         onPressed: () {
                           setState(() {
                             _isStart = !_isStart;
@@ -140,9 +224,9 @@ class _HomePageState extends State<HomePage> {
                           });
                         },
                       ),
-                      RaisedButton(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10.0, vertical: 5.0),
+                      ElevatedButton(
+                        // padding: const EdgeInsets.symmetric(
+                        //     horizontal: 10.0, vertical: 5.0),
                         child: const Text(
                           'Reset',
                           style: TextStyle(
@@ -150,8 +234,8 @@ class _HomePageState extends State<HomePage> {
                               color: Colors.white,
                               fontWeight: FontWeight.w300),
                         ),
-                        color: Colors.blueGrey,
-                        onPressed: () {
+                        // color: Colors.blueGrey,
+                        onPressed: () async {
                           setState(() {
                             _counter = 0;
                           });
@@ -163,12 +247,11 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
-            // bottom section (about)
             Container(
               padding:
                   const EdgeInsets.symmetric(vertical: 6.0, horizontal: 20.0),
               alignment: Alignment.topRight,
-              height: 70.0,
+              height: 100.0,
               // color: Colors.yellow,
               child: IconButton(
                 icon: const Icon(Icons.info),
@@ -203,4 +286,24 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+}
+
+_displayCounterWidget(var _count) {
+  return Container(
+    padding: const EdgeInsets.all(10),
+    child: Text(
+      '$_count',
+      style: const TextStyle(
+        fontSize: 108.0,
+        fontWeight: FontWeight.w400,
+        color: Colors.black,
+      ),
+    ),
+  );
+}
+
+Future<AudioPlayer> _playAudioDing() async {
+  AudioCache cache = AudioCache();
+
+  return await cache.play('ding.mp3');
 }
